@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String   @id @db.VarChar(64)
+  name                   String   @db.VarChar(191)
+  email                  String   @unique @db.VarChar(191)
+  passwordHash           String   @map("password_hash") @db.VarChar(255)
+  role                   String   @default("resident") @db.VarChar(32)
+  contactNumber          String   @map("contact_number") @db.VarChar(32)
+  purok                  String   @db.VarChar(128)
+  address                String   @db.Text
+  residentIdNumber       String   @unique @map("resident_id_number") @db.VarChar(64)
+  isVerified             Boolean  @default(false) @map("is_verified")
+  registrationStatus     String   @default("Pending Approval") @map("registration_status") @db.VarChar(64)
+  isBanned               Boolean  @default(false) @map("is_banned")
+  banReason              String?  @map("ban_reason") @db.Text
+  registeredDate         String   @map("registered_date") @db.VarChar(32)
+  nationality            String   @default("Filipino") @db.VarChar(64)
+  occupation             String?  @db.VarChar(128)
+  employmentStatus       String?  @map("employment_status") @db.VarChar(64)
+  householdIncome        String?  @map("household_income") @db.VarChar(64)
+  familyMembersCount     Int      @default(1) @map("family_members_count")
+  voterStatus            String   @default("Registered") @map("voter_status") @db.VarChar(64)
+  age                    Int?
+  gender                 String?  @db.VarChar(32)
+  avatarUrl              String?  @map("avatar_url") @db.LongText
+  pendingProfileJson     Json?    @map("pending_profile_json")
+  extraProfileJson       Json?    @map("extra_profile_json")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  applications AssistanceApplication[]
+
+  @@index([role], map: "idx_users_role")
+  @@index([purok], map: "idx_users_purok")
+  @@map("users")
+}
+
+model AssistanceProgram {
+  id                      String   @id @db.VarChar(64)
+  title                   String   @db.VarChar(191)
+  category                String   @db.VarChar(128)
+  tagline                 String?  @db.Text
+  description             String   @db.Text
+  imageUrl                String   @map("image_url") @db.Text
+  status                  String   @default("Active") @db.VarChar(32)
+  badgeText               String?  @map("badge_text") @db.VarChar(64)
+  deadline                String?  @db.VarChar(128)
+  targetAudience          String?  @map("target_audience") @db.VarChar(191)
+  processingTime          String?  @map("processing_time") @db.VarChar(128)
+  maxBenefitAmount        String?  @map("max_benefit_amount") @db.VarChar(128)
+  allocatedBudget         Decimal  @default(500000.00) @map("allocated_budget") @db.Decimal(14, 2)
+  disbursedBudget         Decimal  @default(0.00) @map("disbursed_budget") @db.Decimal(14, 2)
+  slotsAvailable          Int      @default(100) @map("slots_available")
+  totalSlots              Int      @default(100) @map("total_slots")
+  requirementsJson        Json?    @map("requirements_json")
+  eligibilityCriteriaJson Json?    @map("eligibility_criteria_json")
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  applications AssistanceApplication[]
+
+  @@index([category], map: "idx_programs_category")
+  @@index([status], map: "idx_programs_status")
+  @@map("assistance_programs")
+}
+
+model AssistanceApplication {
+  id                      String   @id @db.VarChar(64)
+  referenceCode           String   @unique @map("reference_code") @db.VarChar(64)
+  programId               String   @map("program_id") @db.VarChar(64)
+  programTitle            String   @map("program_title") @db.VarChar(191)
+  programCategory         String?  @map("program_category") @db.VarChar(128)
+  applicantId             String   @map("applicant_user_id") @db.VarChar(64)
+  applicantName           String   @map("applicant_name") @db.VarChar(191)
+  contactNumber           String   @map("contact_number") @db.VarChar(32)
+  email                   String?  @db.VarChar(191)
+  purok                   String   @db.VarChar(128)
+  address                 String?  @db.Text
+  householdMonthlyIncome  String?  @map("household_monthly_income") @db.VarChar(64)
+  familyMembersCount      Int?     @map("family_members_count")
+  occupation              String?  @db.VarChar(128)
+  purposeOrDiagnosis      String?  @map("purpose_or_diagnosis") @db.Text
+  status                  String   @default("Submitted") @db.VarChar(64)
+  submissionDate          String   @map("submission_date") @db.VarChar(64)
+  lastUpdated             String?  @map("last_updated") @db.VarChar(64)
+  requestedAmount         String?  @map("requested_amount") @db.VarChar(64)
+  approvedAmount          String?  @map("approved_amount") @db.VarChar(64)
+  evaluatorNotes          String?  @map("evaluator_notes") @db.Text
+  rejectionReason         String?  @map("rejection_reason") @db.Text
+  priorityScore           String?  @map("priority_score") @db.VarChar(32)
+  supportingDocumentsJson Json?    @map("supporting_documents_json")
+  timelineJson            Json?    @map("timeline_json")
+  eligibilityJson         Json?    @map("eligibility_json")
+  officialReceiptNumber   String?  @map("official_receipt_number") @db.VarChar(64)
+  paymentMethod           String?  @map("payment_method") @db.VarChar(64)
+  disbursedBy             String?  @map("disbursed_by") @db.VarChar(191)
+  disbursedAt             String?  @map("disbursed_at") @db.VarChar(64)
+  resubmittedAt           String?  @map("resubmitted_at") @db.VarChar(64)
+  resubmittedNote         String?  @map("resubmitted_note") @db.Text
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  program   AssistanceProgram @relation(fields: [programId], references: [id], onUpdate: Cascade)
+  applicant User              @relation(fields: [applicantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([applicantId], map: "idx_apps_user")
+  @@index([programId], map: "idx_apps_program")
+  @@index([status], map: "idx_apps_status")
+  @@map("assistance_applications")
+}
+
+model Announcement {
+  id                 String   @id @db.VarChar(64)
+  title              String   @db.VarChar(191)
+  category           String   @db.VarChar(64)
+  description        String   @db.Text
+  date               String   @map("publish_date") @db.VarChar(64)
+  viewsCount         Int      @default(0) @map("views_count")
+  iconType           String   @default("general") @map("icon_type") @db.VarChar(64)
+  isPinned           Boolean  @default(false) @map("is_pinned")
+  status             String   @default("Published") @db.VarChar(32)
+  targetAudienceType String?  @map("target_audience_type") @db.VarChar(128)
+  extraJson          Json?    @map("extra_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@index([category], map: "idx_announcements_category")
+  @@index([isPinned], map: "idx_announcements_pinned")
+  @@map("announcements")
+}
+
+model CensusPurok {
+  id               Int      @id @default(autoincrement())
+  purokName        String   @unique @map("purok_name") @db.VarChar(128)
+  population       Int      @default(0)
+  households       Int      @default(0)
+  registeredVoters Int      @default(0) @map("registered_voters")
+  seniorCitizens   Int      @default(0) @map("senior_citizens")
+  workingAge       Int      @default(0) @map("working_age")
+  minors           Int      @default(0)
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("census_puroks")
+}
+
+model Notification {
+  id               String   @id @db.VarChar(64)
+  userId           String?  @map("user_id") @db.VarChar(64)
+  title            String   @db.VarChar(191)
+  message          String   @db.Text
+  read             Boolean  @default(false) @map("is_read")
+  type             String   @default("system") @db.VarChar(64)
+  timestamp        String   @db.VarChar(64)
+  applicationRef   String?  @map("application_ref") @db.VarChar(64)
+  targetArea       String?  @map("target_area") @db.VarChar(64)
+  documentDataJson Json?    @map("document_data_json")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([userId], map: "idx_notifications_user")
+  @@index([read], map: "idx_notifications_read")
+  @@map("notifications")
+}
+
+model ActivityLog {
+  id                String   @id @db.VarChar(64)
+  residentName      String   @map("resident_name") @db.VarChar(191)
+  residentIdNumber  String   @map("resident_id_number") @db.VarChar(64)
+  purok             String   @db.VarChar(128)
+  actionType        String   @map("action_type") @db.VarChar(64)
+  locationOrService String   @map("location_or_service") @db.VarChar(191)
+  timestamp         String   @db.VarChar(64)
+  officerInCharge   String   @map("officer_in_charge") @db.VarChar(191)
+  status            String   @db.VarChar(64)
+  details           String   @db.Text
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@index([residentIdNumber], map: "idx_activity_actor")
+  @@index([actionType], map: "idx_activity_action")
+  @@map("activity_logs")
+}
+
+model ArchivedRecord {
+  id               String   @id @db.VarChar(64)
+  title            String   @db.VarChar(191)
+  originalCategory String   @map("record_type") @db.VarChar(64)
+  referenceCode    String   @map("record_reference") @db.VarChar(128)
+  deletedBy        String   @map("archived_by") @db.VarChar(191)
+  deletedAt        String   @map("deleted_at") @db.VarChar(64)
+  status           String   @default("Archived") @db.VarChar(32)
+  reasonForArchive String?  @map("reason") @db.Text
+  originalDataJson Json?    @map("payload_json")
+  archivedAt       DateTime @default(now()) @map("archived_at")
+
+  @@index([originalCategory], map: "idx_archives_type")
+  @@index([referenceCode], map: "idx_archives_reference")
+  @@map("archived_records")
+}

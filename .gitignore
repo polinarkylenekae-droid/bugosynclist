@@ -1,0 +1,13 @@
+node_modules/
+build/
+dist/
+coverage/
+logs/
+backups/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+data/sms_config.json
+.aistudio/
