@@ -6,10 +6,6 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
-    build: {
-      sourcemap: false,
-      target: ['es2020', 'safari15'],
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

@@ -1,0 +1,30 @@
+This patch removes Firebase dependencies from package.json
+
+To apply this manually:
+
+1. Go to: https://github.com/joshualaurio27-rgb/BugoSyncList2026/blob/main/package.json
+
+2. Click the pencil icon (Edit this file)
+
+3. Find these TWO lines and DELETE them:
+   
+   Line to delete #1:
+   "@firebase/eslint-plugin-security-rules": "^0.0.2",
+   
+   Line to delete #2:
+   "firebase": "^13.4.0",
+
+4. The dependencies section should look like this after deletion:
+
+  "dependencies": {
+    "@google/genai": "^3.6.1",
+    "@prisma/client": "^6.6.0",
+    "@tailwindcss/vite": "^4.1.14",
+    ...rest stays the same...
+  },
+
+5. Scroll down and commit: "Remove Firebase dependencies"
+
+6. Click "Commit changes"
+
+That's it! Then GitHub will auto-trigger a webhook and Koyeb will rebuild.

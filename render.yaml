@@ -1,24 +1,23 @@
 services:
   - type: web
-    name: bugo-sync-list
+    name: bugosynclistapp
     runtime: node
-    plan: starter
     region: singapore
+    plan: free
+    branch: main
     buildCommand: npm ci && npx prisma generate && npm run build
     startCommand: npm start
-    healthCheckPath: /api/health
-    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3000
       - key: FORCE_HTTPS
-        value: "true"
+        value: true
       - key: BCRYPT_ROUNDS
-        value: "12"
+        value: 12
       - key: JWT_EXPIRES_IN
         value: 2h
-      - key: LOG_LEVEL
-        value: info
       - key: APP_URL
         sync: false
       - key: CORS_ORIGIN
@@ -29,9 +28,3 @@ services:
         generateValue: true
       - key: HMAC_SECRET
         generateValue: true
-      - key: SEED_ADMIN_PASSWORD
-        sync: false
-      - key: SEED_RESIDENT_PASSWORD
-        sync: false
-      - key: GEMINI_API_KEY
-        sync: false
